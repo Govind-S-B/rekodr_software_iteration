@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  voice-db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: voice-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ${DATA_VOLUME_PATH}:/var/lib/postgresql/data
+
+  fastapi-app:
+    build: ./src
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - voice-db
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@voice-db:5432/voice-db
+      - AUDIO_DATA_DIR=/app/audio-data-dir
+    volumes:
+      - ${AUDIO_DATA_DIR}:/app/audio-data-dir
