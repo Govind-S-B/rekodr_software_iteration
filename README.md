@@ -9,3 +9,10 @@ python pendant client is the actual client that records and tramsits audio to th
 python telegram client is a software level iteration of the pendant logic  
 
 python web console is the dashboard to see all the audio transcription and play through your voice  
+
+# TODO
+- paginate lists view
+- telegram bot sends audio
+- build transcription summarization embedding queue and update db
+- OPTIONAL : build delegation model queue and tasks and calendar list db tables and working memory of user info or context ( personality , pref , things to remember , etc )
+- rework networking ( @aasish )
