@@ -13,13 +13,32 @@ services:
     volumes:
       - ${DATA_VOLUME_PATH}:/var/lib/postgresql/data
 
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
   fastapi-app:
-    build: ./src
+    build: ./src/api-server
     restart: always
     ports:
       - "8000:8000"
     depends_on:
       - voice-db
+      - rabbitmq
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@voice-db:5432/voice-db
+      - AUDIO_DATA_DIR=/app/audio-data-dir
+    volumes:
+      - ${AUDIO_DATA_DIR}:/app/audio-data-dir
+
+  consumer-service:
+    build: ./src/consumer-service
+    restart: always
+    depends_on:
+      - voice-db
+      - rabbitmq
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@voice-db:5432/voice-db
       - AUDIO_DATA_DIR=/app/audio-data-dir

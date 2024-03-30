@@ -24,6 +24,21 @@ SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+
+
+import pika
+import json
+
+# Function to publish messages
+def publish_message(id):
+    connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))
+    channel = connection.channel()
+    channel.queue_declare(queue='db_entries')
+    channel.basic_publish(exchange='',
+                          routing_key='db_entries',
+                          body=json.dumps({'id': id}))
+    connection.close()
+
 # Endpoint to upload audio file and timestamp
 @app.post("/upload/")
 async def upload_file(timestamp: str, audio_file: UploadFile = File(...)):
@@ -44,6 +59,9 @@ async def upload_file(timestamp: str, audio_file: UploadFile = File(...)):
     transcript = Transcript(timestamp=timestamp, path=file_path)
     db.add(transcript)
     db.commit()
+    print("PUSHING TO QUEUE")
+    publish_message(transcript.id)  # Publish message after commit
+    print("PUSHED TO QUEUE")
     db.close()
 
     return {"message": "File uploaded successfully"}
