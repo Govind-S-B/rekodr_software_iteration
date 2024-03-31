@@ -42,5 +42,8 @@ services:
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@voice-db:5432/voice-db
       - AUDIO_DATA_DIR=/app/audio-data-dir
+      - DEEPGRAM_SECRET_KEY=${DEEPGRAM_SECRET_KEY}
+      - TOGETHER_API_KEY=${TOGETHER_API_KEY}
     volumes:
       - ${AUDIO_DATA_DIR}:/app/audio-data-dir
+

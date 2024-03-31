@@ -16,3 +16,10 @@ python web console is the dashboard to see all the audio transcription and play 
 - build transcription summarization embedding queue and update db
 - OPTIONAL : build delegation model queue and tasks and calendar list db tables and working memory of user info or context ( personality , pref , things to remember , etc )
 - rework networking ( @aasish )
+
+
+
+A fk ton of optimization can be done on where i initialize objects for database session handlers and queue consumers , 
+the current implementation is just a proof of concept level code and not production ready code 
+
+The objects are created everytime the function is called and oh boi its ugly , but it should be trivial thing to fix later ... hopefully

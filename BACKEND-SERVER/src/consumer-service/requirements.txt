@@ -1,1 +1,4 @@
 pika
+sqlalchemy
+psycopg2-binary
+requests

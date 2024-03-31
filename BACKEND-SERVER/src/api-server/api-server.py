@@ -5,6 +5,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 import os
+import pika
+import json
 
 # Define SQLAlchemy models
 Base = declarative_base()
@@ -23,11 +25,6 @@ app = FastAPI()
 SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-
-import pika
-import json
 
 # Function to publish messages
 def publish_message(id):
@@ -59,9 +56,7 @@ async def upload_file(timestamp: str, audio_file: UploadFile = File(...)):
     transcript = Transcript(timestamp=timestamp, path=file_path)
     db.add(transcript)
     db.commit()
-    print("PUSHING TO QUEUE")
     publish_message(transcript.id)  # Publish message after commit
-    print("PUSHED TO QUEUE")
     db.close()
 
     return {"message": "File uploaded successfully"}
@@ -84,6 +79,7 @@ async def get_random_audio_sample():
 
     return sample_data
 
+
 # Endpoint to retrieve audio file
 @app.get("/debug/audio/{audio_id}")
 async def get_audio(audio_id: int):
@@ -96,6 +92,7 @@ async def get_audio(audio_id: int):
         return FileResponse(file_path)
     else:
         raise HTTPException(status_code=404, detail="Audio file not found")
+
 
 # Endpoint to initialize database tables (debug endpoint)
 @app.post("/debug/initialize-db/")
