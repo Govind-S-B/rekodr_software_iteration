@@ -16,8 +16,7 @@ python web console is the dashboard to see all the audio transcription and play 
 - build transcription summarization embedding queue and update db
 - OPTIONAL : build delegation model queue and tasks and calendar list db tables and working memory of user info or context ( personality , pref , things to remember , etc )
 - rework networking ( @aasish )
-
-
+- MIT License Agreement : https://app.suno.ai/song/da6d4a83-1001-4694-8c28-648a6e8bad0a
 
 A fk ton of optimization can be done on where i initialize objects for database session handlers and queue consumers , 
 the current implementation is just a proof of concept level code and not production ready code 
