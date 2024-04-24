@@ -56,10 +56,6 @@ def handle_voice_message(message):
 
         # Check the response
         if response.status_code == 200:
-
-            # This response could be rich according to our new architecture
-
-
             bot.reply_to(message, "Voice message uploaded successfully.")
         else:
             bot.reply_to(message, "Failed to upload voice message.")

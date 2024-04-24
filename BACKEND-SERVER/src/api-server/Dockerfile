@@ -1,4 +1,8 @@
-FROM python:3.9-alpine
+FROM python:3.9-slim-bookworm
+
+# Needed to build hnswlib during pip install. 
+# See here https://github.com/chroma-core/chroma/issues/642
+RUN apt-get update --fix-missing && apt-get install -y --fix-missing build-essential
 
 WORKDIR /app
 

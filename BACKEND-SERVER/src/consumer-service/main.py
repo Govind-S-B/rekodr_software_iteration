@@ -1,17 +1,13 @@
 import pika
 import json
 import external_components
+import requests
 
 from api_key_load_balancer import api_key_load_balancer
 gkeys = api_key_load_balancer(path="./keys/google_keys.json")
 tkeys = api_key_load_balancer(path="./keys/together_keys.json")
 groqkeys = api_key_load_balancer(path="./keys/groq_keys.json")
-
-def summarize():
-    pass
-
-def embedd():
-    pass
+deepgramkeys = api_key_load_balancer(path="./keys/deepgram_keys.json")
 
 def callback(ch, method, properties, body):
     data = json.loads(body)
@@ -56,19 +52,28 @@ def callback(ch, method, properties, body):
         print(f"No transcript found for ID: {data['id']}")
         audio_buffer = None
 
-    transcript = external_components.transcriber_wrapper(audio_buffer)
+    transcript_string = external_components.transcriber_wrapper(audio_buffer,deepgramkeys.get_key())
 
-    print(transcript)
+    embedding = external_components.embedding_wrapper(transcript_string,tkeys.get_key())
 
-    # transcribe the audio file
+    # Send the transcript text to the API
+    api_base_url = "http://fastapi-app:8000"  # Replace with the actual host and port of your API service
 
-    # save the transcript to the database
+    transcript_endpoint = f"{api_base_url}/transcript/{data['id']}"
+    transcript_response = requests.post(transcript_endpoint, json={"transcript_text": transcript_string})
+    if transcript_response.status_code == 200:
+        print("Transcript text added successfully")
+    else:
+        print(f"Failed to add transcript text: {transcript_response.text}")
 
-    # summarize the transcript
+    # Send the embedding to the API
+    embedding_endpoint = f"{api_base_url}/transcript/{data['id']}/embedding"
+    embedding_response = requests.post(embedding_endpoint, json={"embedding": embedding})
+    if embedding_response.status_code == 200:
+        print("Embedding added successfully")
+    else:
+        print(f"Failed to add embedding: {embedding_response.text}")
 
-    # save the summary to the database
-
-    # embedd summary into vector db
 
 def main():
     connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))
