@@ -4,13 +4,13 @@ import requests
 
 # GENERAL COMPONENETS DEFINE HERE
 
-def transcriber_wrapper(buffer_data):
+def transcriber_wrapper(buffer_data,api_key):
     # Define the URL for the Deepgram API endpoint
     url = "https://api.deepgram.com/v1/listen?model=whisper-large"
 
     # Define the headers for the HTTP request
     headers = {
-        "Authorization": f"Token {os.getenv('DEEPGRAM_SECRET_KEY')}",
+        "Authorization": f"Token {api_key}",
         "Content-Type": "audio/*"
     }
 
@@ -29,42 +29,45 @@ def transcriber_wrapper(buffer_data):
 
     return transcribed_str
 
-def llm_wrapper(prompt):
+def llm_wrapper(prompt,api_key):
     
     output_string = ""
 
-    endpoint = 'https://api.together.xyz/inference'
-    api_key = os.getenv("TOGETHER_API_KEY")
+    endpoint = 'https://api.groq.com/openai/v1/chat/completions'
 
     response = requests.post(
     url=endpoint,
     headers={
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
-    },
+    },                
     json={
-        "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
-        "prompt": f"[INST] {prompt} [/INST]",
-        "max_tokens": 16000,
+        "model": "llama3-70b-8192",
+        "max_tokens": 6000,
         "temperature": 0.2,
-    }, )
+        "messages": [
+            {
+                "content": prompt,
+                "role": "user"
+            }
+        ]
+    },)
 
     if response.status_code == 200:
         content = response.json()
-        output_string = content["output"]["choices"][0]["text"]
+        output_string =  content["choices"][0]["message"]["content"]
     else:
         raise Exception(f"Request failed with status code {response.status_code}")
 
     return output_string
 
-def embedding_wrapper(input_string):
+def embedding_wrapper(input_string,api_key):
 
 
     ENDPOINT_URL = "https://api.together.xyz/v1/embeddings"
-    TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 
     headers = {
-        "Authorization": f"Bearer {TOGETHER_API_KEY}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
 

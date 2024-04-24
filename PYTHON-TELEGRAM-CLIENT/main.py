@@ -12,15 +12,17 @@ from pydub import AudioSegment
 load_dotenv(".env")
 bot = telebot.TeleBot(os.getenv("BOT_TOKEN"))
 
-@bot.message_handler(commands=['start', 'help'])
-def send_welcome(message):
-    bot.reply_to(message, "Howdy, how are you doing?")
+UID = None
+
+@bot.message_handler(commands=['start'])
+def start_handler(message):
+    global UID
+    UID = message.chat.id
 
 
-@bot.message_handler(func=lambda message: True)
-def echo_all(message):
-    bot.reply_to(message, message.text)
-
+# @bot.message_handler(func=lambda message: True)
+# def echo_all(message):
+#     bot.reply_to(message, message.text)
 
 
 @bot.message_handler(content_types=['voice'])
@@ -54,6 +56,10 @@ def handle_voice_message(message):
 
         # Check the response
         if response.status_code == 200:
+
+            # This response could be rich according to our new architecture
+
+
             bot.reply_to(message, "Voice message uploaded successfully.")
         else:
             bot.reply_to(message, "Failed to upload voice message.")

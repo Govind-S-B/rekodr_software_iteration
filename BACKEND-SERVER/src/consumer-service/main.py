@@ -2,6 +2,11 @@ import pika
 import json
 import external_components
 
+from api_key_load_balancer import api_key_load_balancer
+gkeys = api_key_load_balancer(path="./keys/google_keys.json")
+tkeys = api_key_load_balancer(path="./keys/together_keys.json")
+groqkeys = api_key_load_balancer(path="./keys/groq_keys.json")
+
 def summarize():
     pass
 
@@ -54,7 +59,6 @@ def callback(ch, method, properties, body):
     transcript = external_components.transcriber_wrapper(audio_buffer)
 
     print(transcript)
-
 
     # transcribe the audio file
 
